@@ -13,6 +13,7 @@ lm = LoginManager()
 lm.init_app(app)
 app.config.from_object(DevelopmentConfig)
 db = SQLAlchemy(app)
+app.app_context().push()
 store = SQLAlchemyStore(db.engine, db.metadata, 'sessions')
 kvsession = KVSessionExtension(store, app)
 
