@@ -4,7 +4,7 @@ from clipperz import app, db, lm
 from .models import User
 from .api import *  # NOQA
 from .exceptions import InvalidUsage
-from flask.ext.login import login_required
+from flask_login import login_required
 from os.path import dirname
 
 

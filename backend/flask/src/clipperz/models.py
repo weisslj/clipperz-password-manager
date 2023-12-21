@@ -1,7 +1,7 @@
 """Clipperz models."""
 import datetime
 
-from flask.ext.login import UserMixin
+from flask_login import UserMixin
 
 from clipperz import app, db
 

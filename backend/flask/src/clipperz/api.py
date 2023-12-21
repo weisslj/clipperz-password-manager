@@ -5,7 +5,7 @@ import hashlib
 
 from flask import jsonify, session, g
 from datetime import datetime
-from flask.ext.login import logout_user, current_user, login_user, \
+from flask_login import logout_user, current_user, login_user, \
     login_required
 from sqlalchemy.orm.exc import NoResultFound
 from clipperz import app, db
