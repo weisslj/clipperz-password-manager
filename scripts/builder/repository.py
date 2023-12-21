@@ -19,6 +19,7 @@ def repositoryWithPath (path):
 			print "Use sudo apt-get install python-git for Ubuntu/Debian"
 			print "Use sudo yum install GitPython for Fedora/RHEL/CentOS"
 			print "Or manually running the following command: easy_install gitpython"
+			raise SystemExit(1)
 		except:
 			result = SnapshotRepository('', path)
 
