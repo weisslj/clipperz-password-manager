@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 import sys, os, re
@@ -6,7 +6,7 @@ import cssmin
 import jsmin
 import codecs
 import shutil
-import StringIO
+import io
 import urllib
 
 import main
@@ -53,7 +53,7 @@ class FrontendBuilder(object):
 		module = self.module
 		if (self.module != self.submodule):
 			module = module + "." + self.submodule
-		print "frontend [" + module + "]: " + message
+		print("frontend [" + module + "]: " + message)
 	
 
 	def absolutePathForSources (self):
@@ -117,7 +117,7 @@ class FrontendBuilder(object):
 			try:
 				fileHandler = codecs.open(self.absolutePathForSourceFile(basePath, file), 'r', 'utf-8')
 			except:
-				print "FILE: " + file
+				print("FILE: " + file)
 
 			result[file] = fileHandler.read()
 			fileHandler.close()
@@ -146,7 +146,7 @@ class FrontendBuilder(object):
 
 	def template (self):
 		processedFile = 'html_template'
-		if not self.processedFiles.has_key(processedFile):
+		if processedFile not in self.processedFiles:
 		#	self.processedFiles[processedFile] = self.loadFilesContent('html', ['index_template.html'])
 			self.processedFiles[processedFile] = self.loadFilesContent('html', [self.settings['html.template']])
 			
@@ -197,7 +197,7 @@ class FrontendBuilder(object):
 		
 		    # output rule if it contains any declarations
 		    if properties:
-		        print "%s{%s}" % ( ','.join( selectors ), ''.join(['%s:%s;' % (key, properties[key]) for key in porder])[:-1] )
+		        print("%s{%s}" % ( ','.join( selectors ), ''.join(['%s:%s;' % (key, properties[key]) for key in porder])[:-1] ))
 		
 		return css
 
@@ -218,8 +218,8 @@ class FrontendBuilder(object):
 
 	def compressJS_jsmin (self, js, description):
 		self.log("compressing " + description + " code")
-		original = StringIO.StringIO(js)
-		output = StringIO.StringIO()
+		original = io.StringIO(js)
+		output = io.StringIO()
 		
 		jsMinifier = jsmin.JavascriptMinify()
 		jsMinifier.minify(original, output)
@@ -287,7 +287,7 @@ class FrontendBuilder(object):
 
 	def bookmarklet (self):
 		cacheKey = 'bookmarklet'
-		if not self.processedFiles.has_key(cacheKey):
+		if cacheKey not in self.processedFiles:
 			result = 'bookmarklet="' + self.packBookmarklet(self.loadFilesContent('js', ['Bookmarklet.js']), "regular") + '";bookmarklet_ie="' + self.packBookmarklet(self.loadFilesContent('js', ['Bookmarklet_IE.js']), "IE") + '";'
 			self.processedFiles[cacheKey] = result
 		else:
@@ -316,7 +316,7 @@ class FrontendBuilder(object):
 
 	def assembleCopyrightHeader (self):
 		processedFile = 'copyright'
-		if not self.processedFiles.has_key(processedFile):
+		if processedFile not in self.processedFiles:
 			#self.log("assembling copyright header")
 			copyrightValues = self.settings['copyright.values']
 			license = self.loadFilesContent('../../properties', ['license.txt'])
@@ -333,7 +333,7 @@ class FrontendBuilder(object):
 
 	def cssTagsForFiles (self, basePath, files):
 		#<link rel="stylesheet" type="text/css" href="./css/reset-min.css" />
-		return '\n'.join(map(lambda file: '<link rel="stylesheet" type="text/css" href="' + basePath + '/' + file + '" />', files))
+		return '\n'.join(['<link rel="stylesheet" type="text/css" href="' + basePath + '/' + file + '" />' for file in files])
 	
 
 	def cssTagForContent (self, content):
@@ -342,7 +342,7 @@ class FrontendBuilder(object):
 
 	def scriptTagsForFiles (self, basePath, files):
 		#<script type='text/javascript' src='./js/src/bookmarklet.js'></script>
-		return '\n'.join(map(lambda file: '<script type="text/javascript" src="' + basePath + '/' + file + '" charset="utf-8"></script>', files))
+		return '\n'.join(['<script type="text/javascript" src="' + basePath + '/' + file + '" charset="utf-8"></script>' for file in files])
 	
 
 	def scriptTagForContent (self, content):
@@ -351,7 +351,7 @@ class FrontendBuilder(object):
 
 	def assembleVersion (self, pageTitle, copyright, css, js, jsLoadMode, version, versionType):
 		cacheKey = version + "-" + versionType
-		if not self.processedFiles.has_key(cacheKey):
+		if cacheKey not in self.processedFiles:
 			result = self.replaceTemplatePlaceholders(pageTitle, copyright, css, js, jsLoadMode, version, versionType)
 			self.processedFiles[cacheKey] = result
 		else:

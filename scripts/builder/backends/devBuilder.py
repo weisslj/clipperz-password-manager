@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 import os
@@ -30,7 +30,7 @@ class DevBuilder(BackendBuilder):
 
 
 	def run (self):
-		print self.name() + " - RUN (dev)"
+		print(self.name() + " - RUN (dev)")
 
 		for frontend in self.frontends:
 			if (frontend.module == frontend.submodule):

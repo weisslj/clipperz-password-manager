@@ -67,7 +67,7 @@ var tests = {
 //			ctr = Crypto.Util.Counter.new(128, initial_value=iv)
 //			cipher = AES.new(key, Crypto.Cipher.AES.MODE_CTR, counter=ctr)
 //			encryptedValue = cipher.encrypt(cleanText.encode('utf-8'))
-//			data = base64.b64encode(base64.b16decode(hex(iv).upper()[2:-1]) + encryptedValue)
+//			data = base64.b64encode(base64.b16decode(hex(iv).upper()[2:]) + encryptedValue)
 //			
 //			return data
 		

@@ -18,7 +18,7 @@ from .models import User, Record, RecordVersion, OneTimePassword
 # ==============================================================================
 def randomSeed():
     """Generate a random seed."""
-    return hex(random.getrandbits(32*8))[2:-1]
+    return hex(random.getrandbits(32*8))[2:]
 
 
 def clipperzHash(aString):
@@ -27,7 +27,7 @@ def clipperzHash(aString):
     sha256(sha256(aString))
     """
     firstRound = hashlib.sha256()
-    firstRound.update(aString)
+    firstRound.update(aString.encode())
     result = hashlib.sha256()
     result.update(firstRound.digest())
 
@@ -88,7 +88,7 @@ class handshake(HandlerMixin):
 
     srp_n = '115b8b692e0e045692cf280b436735c77a5a9e8a9e7ed56c965f87db5b2a2ece3'
     srp_g = 2
-    srp_n = long(srp_n, 16)
+    srp_n = int(srp_n, 16)
 
     def connect(self, parameters, request):
         """Process a connect request.
@@ -129,7 +129,7 @@ class handshake(HandlerMixin):
                     db.session.add(one_time_password)
                     db.session.commit()
 
-                except Exception, detail:
+                except Exception as detail:
                     app.logger.error("connect.optid: " + str(detail))
 
         else:
@@ -141,13 +141,13 @@ class handshake(HandlerMixin):
 
         session['b'] = randomSeed()
         k = '0x64398bff522814e306a97cb9bfc4364b7eed16a8c17c5208a40a2bad2933c8e'
-        k = long(k, 16)
+        k = int(k, 16)
         app.logger.debug('k: %s (%s)', k, hex(k))
-        session['B'] = hex(k * long("0x%s" % session['v'], 16) +
+        session['B'] = hex(k * int("0x%s" % session['v'], 16) +
                            pow(self.srp_g,
-                               long("0x%s" % session['b'], 16),
+                               int("0x%s" % session['b'], 16),
                                self.srp_n)
-                           )[2:-1]
+                           )[2:]
         result['s'] = session['s']
         result['B'] = session['B']
         app.logger.debug('Session: %s', session)
@@ -184,12 +184,12 @@ class handshake(HandlerMixin):
             },
         }
 
-        A = long("0x%s" % session['A'], 16)
-        B = long("0x%s" % session['B'], 16)
-        b = long("0x%s" % session['b'], 16)
-        v = long("0x%s" % session['v'], 16)
-        u = long("0x%s" % clipperzHash(str(A) + str(B)), 16)
-        s = long("0x%s" % session['s'], 16)
+        A = int("0x%s" % session['A'], 16)
+        B = int("0x%s" % session['B'], 16)
+        b = int("0x%s" % session['b'], 16)
+        v = int("0x%s" % session['v'], 16)
+        u = int("0x%s" % clipperzHash(str(A) + str(B)), 16)
+        s = int("0x%s" % session['s'], 16)
         C = session['C']
         n = self.srp_n
 
@@ -262,7 +262,7 @@ class handshake(HandlerMixin):
                     otp.status = 'DISABLED'
             db.session.add(otp)
             db.session.commit()
-        except NoResultFound, details:
+        except NoResultFound as details:
             app.logger.debug('OTP No Results Found: ', details)
 
         return jsonify({'result': result})

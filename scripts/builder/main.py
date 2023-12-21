@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 import sys
@@ -35,7 +35,7 @@ def createFolder (path):
 #--------------------------------------------------------------------
 
 def loadSettings (component, module):
-	# print "MODULE: " + module
+	# print("MODULE: " + module)
 
 	if '.' in module:
 		moduleComponents = module.split('.')
@@ -75,7 +75,7 @@ def assembleBackend (backend, frontends, versions):
 	
 	builderModuleName = backend + 'Builder'
 	builderClassName  = backend.capitalize() + 'Builder'
-	#print ("BUILD BACKENDS - module: " + builderModuleName + " , class: " + builderClassName)
+	#print("BUILD BACKENDS - module: " + builderModuleName + " , class: " + builderClassName)
 	builderModule  = __import__(builderModuleName)
 	builderClass   = getattr(builderModule, builderClassName)
 	
@@ -92,14 +92,14 @@ def build (settings, repository):
 #			print "\nWARNING: repository has pending changes\n"
 			raise Exception("repository has pending changes, can't 'install'")
 		else:
-			print "\nWARNING: repository has pending changes\n"
+			print("\nWARNING: repository has pending changes\n")
 
 	for frontend in settings['frontends']:
 		normalizedFrontendName = frontend.replace(".", "_")
 		builderModuleName = normalizedFrontendName + 'Builder'
 		builderClassName  = normalizedFrontendName.title() + 'Builder'
 
-		#print ("BUILD FRONTEND - module: " + builderModuleName + " , class: " + builderClassName)
+		#print("BUILD FRONTEND - module: " + builderModuleName + " , class: " + builderClassName)
 		builderModule  = __import__(builderModuleName)
 		builderClass   = getattr(builderModule, builderClassName)
 		builder = builderClass(frontend, loadSettings('frontend', frontend), repository.version())
@@ -112,7 +112,7 @@ def build (settings, repository):
 #--------------------------------------------------------------------
 
 def clean ():
-	# print "cleaning up …"
+	# print("cleaning up …")
 	if os.path.exists(projectTargetDir()):
 		shutil.rmtree(projectTargetDir())
 
@@ -120,17 +120,17 @@ def clean ():
 
 def usage (message):
 	if message != None:
-		print "ERROR: " + message
+		print("ERROR: " + message)
 	
-	print
-	# print "build clean"
-	# print "build clean install"
-	print "build install --ALL"
-	print "build install debug --ALL"
-	print "build install debug development --ALL"
-	# print "build clean install debug --ALL"
-	print "build install debug --backends php python --frontends beta gamma"
-	print "build install debug development --backends php python --frontends beta gamma gamma.mobile"
+	print()
+	# print("build clean")
+	# print("build clean install")
+	print("build install --ALL")
+	print("build install debug --ALL")
+	print("build install debug development --ALL")
+	# print("build clean install debug --ALL")
+	print("build install debug --backends php python --frontends beta gamma")
+	print("build install debug development --backends php python --frontends beta gamma gamma.mobile")
 	exit(1)
 
 #--------------------------------------------------------------------
@@ -181,11 +181,11 @@ def main ():
 				settings['backends'] = []
 			settings['backends'].append('checksum')
 		
-		if (not settings.has_key('versions')):
+		if ('versions' not in settings):
 			usage("missing 'versions'")
-		if (not settings.has_key('frontends')):
+		if ('frontends' not in settings):
 			usage("missing 'frontends'")
-		if (not settings.has_key('backends')):
+		if ('backends' not in settings):
 			usage("missing 'backends'")
 		
 		build(settings, currentRepository)

@@ -97,7 +97,7 @@ class ClipperzTestSite(server.Site):
 #						print("-> image - gif")
 						contentType = 'image/gif'
 					else:
-						print "ERROR - unknown image extension: " + fileExtension
+						print("ERROR - unknown image extension: " + fileExtension)
 
 					absoluteFilePath = basePath + '/'.join(pathParts)
 				else:

@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-from __future__ import print_function
+#!/usr/bin/env python3
+
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 import io

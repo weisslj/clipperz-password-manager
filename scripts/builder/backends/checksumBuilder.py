@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 import os
@@ -30,7 +30,7 @@ class ChecksumBuilder(BackendBuilder):
 
 
 	def run (self):
-		print self.name() + " - RUN (checksum)"
+		print(self.name() + " - RUN (checksum)")
 
 		for frontend in self.frontends:
 			if (frontend.module == frontend.submodule):
@@ -44,7 +44,7 @@ class ChecksumBuilder(BackendBuilder):
 			self.writeToFolder(self.frontEndTempFolder(), os.path.join(frontend.module, 'index' + submoduleExtension + '.html'), index)
 			frontend.copyResourcesToFolder(self.frontEndTempFolder(), self.settings)
 			self.logChecksums(index, "[" + self.name() + " - " + frontend.module + "] index" + submoduleExtension + ".html checksum")
-			print ""
+			print("")
 
 		self.createPackage()
 

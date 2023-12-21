@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 def repositoryWithPath (path):
@@ -14,11 +14,11 @@ def repositoryWithPath (path):
 			from git import Repo
 			repo = Repo(path)
 			result = GitRepository(repo, path)
-		except ImportError, exception:
-			print "Failed to import git, please install http://gitorious.org/git-python"
-			print "Use sudo apt-get install python-git for Ubuntu/Debian"
-			print "Use sudo yum install GitPython for Fedora/RHEL/CentOS"
-			print "Or manually running the following command: easy_install gitpython"
+		except ImportError as exception:
+			print("Failed to import git, please install http://gitorious.org/git-python")
+			print("Use sudo apt-get install python-git for Ubuntu/Debian")
+			print("Use sudo yum install GitPython for Fedora/RHEL/CentOS")
+			print("Or manually running the following command: easy_install gitpython")
 			raise SystemExit(1)
 		except:
 			result = SnapshotRepository('', path)
@@ -69,7 +69,7 @@ class GitRepository(Repository):
 	def areTherePendingChanges (self):
 		try:
 			return self.repository.is_dirty()
-		except TypeError, te:
+		except TypeError as te:
 			return self.repository.is_dirty
 
 
@@ -85,7 +85,7 @@ class HgRepository(Repository):
 		return 'hg: ' + str(self.repository['tip'].node)
 
 	def areTherePendingChanges (self):
-		return not all(map(lambda fileList: len(fileList) == 0, self.repository.hg_status()))
+		return not all([len(fileList) == 0 for fileList in self.repository.hg_status()])
 
 
 #===================================================================

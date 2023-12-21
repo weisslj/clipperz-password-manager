@@ -42,12 +42,12 @@ from django.utils import simplejson
 sessionTimeout = datetime.timedelta(minutes=-2)
 
 def randomSeed():
-	return hex(random.getrandbits(32*8))[2:-1]
+	return hex(random.getrandbits(32*8))[2:]
 
 def clipperzHash(aString):
 	#logging.info(">>> string: " + aString)
 	firstRound = hashlib.sha256()
-	firstRound.update(aString)
+	firstRound.update(aString.encode())
 	#logging.info("firstRound: " + firstRound.hexdigest() + " - " + firstRound.digest())
 	result = hashlib.sha256()
 	result.update(firstRound.digest())
@@ -253,8 +253,8 @@ class XHR(webapp.RequestHandler):
 		#----------------------------------------------------------------------
 
 		elif method == 'handshake':
-			srp_g = 2L
-			srp_n = long("0x%s" % "115b8b692e0e045692cf280b436735c77a5a9e8a9e7ed56c965f87db5b2a2ece3", 16)
+			srp_g = 2
+			srp_n = int("0x%s" % "115b8b692e0e045692cf280b436735c77a5a9e8a9e7ed56c965f87db5b2a2ece3", 16)
 
 			message = parameters['message'];
 
@@ -274,16 +274,16 @@ class XHR(webapp.RequestHandler):
 						
 						if oneTimePassword.parent().username != user.username:
 							oneTimePassword.reset('DISABLED').put()
-							raise Exception, "User missmatch between the current session and 'One Time Password' user"
+							raise Exception("User missmatch between the current session and 'One Time Password' user")
 						elif oneTimePassword.status != 'REQUESTED':
 							oneTimePassword.reset('DISABLED').put()
-							raise Exception, "Tring to use an 'One Time Password' in the wrong state"
+							raise Exception("Tring to use an 'One Time Password' in the wrong state")
 
 						oneTimePassword.reset("USED").put()
 
 						result['oneTimePassword'] = oneTimePassword.reference
 
-					except Exception, detail:
+					except Exception as detail:
 						logging.error("connect.optId: " + str(detail))
 
 					session.s = user.srp_s
@@ -293,7 +293,7 @@ class XHR(webapp.RequestHandler):
 					session.v = "112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00"
 
 				session.b = randomSeed()
-				session.B = hex(long("0x%s" % session.v, 16) + pow(srp_g, long("0x%s" %session.b, 16), srp_n))[2:-1]
+				session.B = hex(int("0x%s" % session.v, 16) + pow(srp_g, int("0x%s" %session.b, 16), srp_n))[2:]
 
 				result['s'] = session.s
 				result['B'] = session.B
@@ -301,11 +301,11 @@ class XHR(webapp.RequestHandler):
 			#------------------------------------------------------------------
 
 			elif message == 'credentialCheck':
-				B = long("0x%s" % session.B, 16)
-				b = long("0x%s" % session.b, 16)
-				A = long("0x%s" % session.A, 16)
-				v = long("0x%s" % session.v, 16)
-				u = long("0x%s" % clipperzHash(str(B)), 16)
+				B = int("0x%s" % session.B, 16)
+				b = int("0x%s" % session.b, 16)
+				A = int("0x%s" % session.A, 16)
+				v = int("0x%s" % session.v, 16)
+				u = int("0x%s" % clipperzHash(str(B)), 16)
 				n = srp_n
 
 				S  = pow((A * pow(v, u, n)), b, n)
@@ -344,11 +344,11 @@ class XHR(webapp.RequestHandler):
 
 						else:
 							oneTimePassword.reset('DISABLED').put()
-							raise Exception, "The requested One Time Password has been disabled, due to a wrong keyChecksum"
+							raise Exception("The requested One Time Password has been disabled, due to a wrong keyChecksum")
 					else:
-						raise Exception, "The requested One Time Password was not active"
+						raise Exception("The requested One Time Password was not active")
 				else:
-					raise Exception, "The requested One Time Password has not been found"
+					raise Exception("The requested One Time Password has not been found")
 
 		#----------------------------------------------------------------------
 
@@ -429,7 +429,7 @@ class XHR(webapp.RequestHandler):
 					result['lock'] = user.lock
 					result['result'] = 'done'
 
-			 	elif message == 'deleteRecords':
+				elif message == 'deleteRecords':
 					user = db.Query(User).filter('username =', session.C).get()
 					user.update(parameters['parameters']['user'])
 
