@@ -1,11 +1,12 @@
 """Clipperz views."""
-from flask import session, request, g, send_from_directory
-from clipperz import app, db, lm
+from flask import session, request, g, send_from_directory, make_response
+from clipperz import app, db, lm, APP_ROOT
 from .models import User
 from .api import *  # NOQA
 from .exceptions import InvalidUsage
 from flask_login import login_required
-from os.path import dirname
+from os.path import dirname, join
+import json
 
 
 @lm.user_loader
@@ -75,9 +76,31 @@ def dump(frontend_version):
             'creationDate':     str(current_record.creation_date),
             'updateDate':       str(current_record.update_date),
             'accessDate':       str(current_record.access_date),
-            'currentVersion':   current_record.current_record_version,
+            'currentVersion':   current_record.current_record_version.reference,
             'versions':         versions
         }
+
+    accountInfo = {
+        'features': [
+            'UPDATE_CREDENTIALS',
+            'EDIT_CARD',
+            'CARD_DETAILS',
+            'ADD_CARD',
+            'DELETE_CARD',
+            'OFFLINE_COPY',
+            'LIST_CARDS'
+        ],
+        'paramentVerificationPending': False,
+        'currentSubscriptionType': 'EARLY_ADOPTER',
+        'isExpiring': False,
+        'latestActiveLevel': 'EARLY_ADOPTER',
+        'payments': [],
+        'featureSet': 'FULL',
+        'latestActiveThreshold': -1.0,
+        'referenceDate': str(datetime.now()),
+        'isExpired': False,
+        'expirationDate': str(datetime(4001, 1, 1))
+    }
 
     user_data['users'][user.username] = {
         's':                    user.srp_s,
@@ -87,25 +110,26 @@ def dump(frontend_version):
         'userDetails':          user.header,
         'statistics':           user.statistics,
         'userDetailsVersion':   user.version,
+        'accountInfo':          accountInfo,
         'records':              records
     }
 
     offline_data_placeholder = (
-        '_clipperz_data_ = {user_data}\n'
+        '_clipperz_dump_data_ = {user_data}\n'
         'Clipperz.PM.Proxy.defaultProxy = new Clipperz.PM.Proxy.Offline();'
         '\n'
         'Clipperz.Crypto.PRNG.defaultRandomGenerator()'
         '.fastEntropyAccumulationForTestingPurpose();'
-        '\n').format(user_data=user_data)
+        '\n').format(user_data=json.dumps(user_data, indent=4))
 
-    with open(os.path.join(APP_ROOT,
-                           '{0}/index.html'.format(frontend_version))) as f:
+    with open(join(dirname(APP_ROOT),
+                   '{0}/index.html'.format(frontend_version))) as f:
         offline_dump = f.read()
 
     offline_dump = offline_dump.replace('/*offline_data_placeholder*/',
                                         offline_data_placeholder)
     response = make_response(offline_dump)
-    content_disposition = "attachment; filename='Clipperz.html'"
+    content_disposition = "attachment; filename=Clipperz.html"
     response.headers['Content-Disposition'] = content_disposition
 
     return response
